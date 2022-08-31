@@ -75,10 +75,18 @@ class _Login_viewState extends State<Login_view> {
           final email = _email.text;
           final password = _password.text;
           try {
-            final userCredential = await FirebaseAuth.instance
-                .signInWithEmailAndPassword(email: email, password: password);
-            print(userCredential);
+            final userCredential =
+                await FirebaseAuth.instance.signInWithEmailAndPassword(
+              email: email,
+              password: password,
+            );
+            if (!mounted) return;
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              '/main/',
+              (route) => false,
+            );
           } on FirebaseAuthException catch (e) {
+            print(e.code);
             if (e.code == 'user-not-found') {
               print(e.code);
               print('User Not Found');
@@ -86,6 +94,8 @@ class _Login_viewState extends State<Login_view> {
             } else if (e.code == 'wrong-password') {
               print(e.code);
               print('Wrong Password');
+            } else if (e.code == 'unknown') {
+              print('please Fill out');
             }
           }
         },
