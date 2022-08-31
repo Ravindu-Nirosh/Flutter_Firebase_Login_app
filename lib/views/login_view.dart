@@ -87,17 +87,16 @@ class _Login_viewState extends State<Login_view> {
               (route) => false,
             );
           } on FirebaseAuthException catch (e) {
-            print(e.code);
-            if (e.code == 'user-not-found') {
-              print(e.code);
-              print('User Not Found');
-              print(e.runtimeType);
-            } else if (e.code == 'wrong-password') {
-              print(e.code);
-              print('Wrong Password');
-            } else if (e.code == 'unknown') {
-              print('please Fill out');
-            }
+            //print(e.code);
+            //if (e.code == 'user-not-found') {
+            showErrorDialog(context, e.code);
+            // print(e.runtimeType);
+            //} else if (e.code == 'wrong-password') {
+            //  print(e.code);
+            //  print('Wrong Password');
+            // } else if (e.code == 'unknown') {
+            // print('please Fill out');
+            // }
           }
         },
         child: const Text('Login'),
@@ -148,4 +147,22 @@ class _Login_viewState extends State<Login_view> {
       ),
     );
   }
+}
+
+Future<void> showErrorDialog(BuildContext context, String text) {
+  return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Error Occurred'),
+          content: Text(text),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Ok'))
+          ],
+        );
+      });
 }
