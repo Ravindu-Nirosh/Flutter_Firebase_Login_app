@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mynote/constants/routes.dart';
+import 'package:mynote/utilities/show_error_diloag.dart';
 import '../firebase_options.dart';
 
 class Register extends StatefulWidget {
@@ -89,9 +90,15 @@ class _RegisterState extends State<Register> {
         onPressed: () async {
           final email = _email.text;
           final password = _password.text;
-          final userCredential = await FirebaseAuth.instance
-              .createUserWithEmailAndPassword(email: email, password: password);
-          print(userCredential);
+          try {
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                email: email, password: password);
+            final user = FirebaseAuth.instance.currentUser;
+            await user?.sendEmailVerification();
+            Navigator.of(context).pushNamed(verifyEmailRoute);
+          } on FirebaseAuthException catch (e) {
+            showErrorDialog(context, e.code);
+          }
         },
         child: const Text('Register'),
       ),

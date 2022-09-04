@@ -1,8 +1,6 @@
-import 'dart:developer' as dev;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:mynote/constants/routes.dart';
 import 'package:mynote/views/Verify_Email_View.dart';
 import 'package:mynote/views/register_view.dart';
@@ -20,7 +18,8 @@ void main() {
     routes: {
       loginRoutes: (context) => const Login_view(),
       registerRoutes: (context) => const Register(),
-      noteRoutes: (context) => const NoteView()
+      noteRoutes: (context) => const NoteView(),
+      verifyEmailRoute: (context) => const VerifyEmailView()
     },
   ));
 }
@@ -42,8 +41,9 @@ class _HomePageState extends State<HomePage> {
         switch (snapshot.connectionState) {
           case ConnectionState.done:
             final user = FirebaseAuth.instance.currentUser;
+            user?.reload();
             if (user != null) {
-              if (user.emailVerified) {
+              if (user.emailVerified == true) {
                 return const NoteView();
               } else {
                 return const VerifyEmailView();

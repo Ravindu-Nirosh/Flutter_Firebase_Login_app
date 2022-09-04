@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mynote/constants/routes.dart';
 import '../firebase_options.dart';
+import '../utilities/show_error_diloag.dart';
 
 class Login_view extends StatefulWidget {
   const Login_view({Key? key}) : super(key: key);
@@ -81,15 +82,22 @@ class _Login_viewState extends State<Login_view> {
               email: email,
               password: password,
             );
+            final user = FirebaseAuth.instance.currentUser;
+            print(user);
             if (!mounted) return;
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              noteRoutes,
-              (route) => false,
-            );
+            if (user!.emailVerified) {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                noteRoutes,
+                (route) => false,
+              );
+            } else {
+              Navigator.of(context).pushNamed(verifyEmailRoute);
+              showErrorDialog(context, 'Please Verify Your Email Address');
+            }
           } on FirebaseAuthException catch (e) {
             //print(e.code);
             //if (e.code == 'user-not-found') {
-            showErrorDialog(context, e.code);
+            await showErrorDialog(context, e.code);
             // print(e.runtimeType);
             //} else if (e.code == 'wrong-password') {
             //  print(e.code);
@@ -147,22 +155,4 @@ class _Login_viewState extends State<Login_view> {
       ),
     );
   }
-}
-
-Future<void> showErrorDialog(BuildContext context, String text) {
-  return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Error Occurred'),
-          content: Text(text),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Ok'))
-          ],
-        );
-      });
 }
